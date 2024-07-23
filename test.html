@@ -1,0 +1,46 @@
+import java.awt.Color;
+import robocode.*;
+
+public class ImprovedRobot extends Robot {
+
+    public void run() {
+        // Set the colors of the robot
+        setColors(Color.red, Color.blue, Color.green);
+
+        // Robot main loop
+        while (true) {
+            // Move in a less predictable pattern
+            ahead(100);
+            turnRight(45); // Change direction to make it less predictable
+            turnGunRight(360);
+            ahead(50); // Change movement distance
+            turnLeft(90); // Change direction to make it less predictable
+            turnGunRight(360);
+        }
+    }
+
+    public void onScannedRobot(ScannedRobotEvent e) {
+        // Fire with varying power based on distance to the target
+        double distance = e.getDistance();
+        if (distance < 100) {
+            fire(3); // Close range, high power
+        } else if (distance < 200) {
+            fire(2); // Medium range, medium power
+        } else {
+            fire(1); // Long range, low power
+        }
+    }
+
+    public void onHitByBullet(HitByBulletEvent e) {
+        // Evasive action when hit by a bullet
+        turnRight(90 - e.getBearing()); // Turn perpendicular to the bullet
+        ahead(150); // Move ahead to evade
+        turnGunRight(360); // Scan for the attacker
+    }
+
+    public void onHitWall(HitWallEvent e) {
+        // Move away from the wall
+        back(50);
+        turnRight(90);
+    }
+}
