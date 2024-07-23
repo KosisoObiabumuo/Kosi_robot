@@ -1,7 +1,7 @@
 import java.awt.Color;
 import robocode.*;
 
-public class ImprovedRobot extends Robot {
+public class AdvancedRobot extends Robot {
 
     public void run() {
         // Set the colors of the robot
@@ -11,11 +11,18 @@ public class ImprovedRobot extends Robot {
         while (true) {
             // Move in a less predictable pattern
             ahead(100);
-            turnRight(45); // Change direction to make it less predictable
-            turnGunRight(360);
-            ahead(50); // Change movement distance
-            turnLeft(90); // Change direction to make it less predictable
-            turnGunRight(360);
+            turnRight(45);
+            scanForRobots();
+            ahead(50);
+            turnLeft(90);
+            scanForRobots();
+        }
+    }
+
+    public void scanForRobots() {
+        // More efficient scanning
+        for (int i = 0; i < 12; i++) { // Incremental scanning in 30-degree steps
+            turnGunRight(30);
         }
     }
 
@@ -33,14 +40,34 @@ public class ImprovedRobot extends Robot {
 
     public void onHitByBullet(HitByBulletEvent e) {
         // Evasive action when hit by a bullet
-        turnRight(90 - e.getBearing()); // Turn perpendicular to the bullet
+        double bearing = e.getBearing();
+        if (Math.random() > 0.5) {
+            turnRight(90 - bearing);
+        } else {
+            turnLeft(90 + bearing);
+        }
         ahead(150); // Move ahead to evade
-        turnGunRight(360); // Scan for the attacker
+        scanForRobots();
+    }
+
+    public void onHitRobot(HitRobotEvent e) {
+        // Handle collision with another robot
+        if (e.isMyFault()) {
+            back(50); // Move back if it was our fault
+        } else {
+            ahead(50); // Move ahead if it was not our fault
+        }
+        scanForRobots();
     }
 
     public void onHitWall(HitWallEvent e) {
         // Move away from the wall
         back(50);
         turnRight(90);
+    }
+
+    public void onRobotDeath(RobotDeathEvent e) {
+        // React to a robot being destroyed
+        scanForRobots();
     }
 }
